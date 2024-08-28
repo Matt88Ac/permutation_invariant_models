@@ -1,25 +1,30 @@
-if __name__ == '__main__':
-    import os
-
-    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
+from itertools import permutations
+from typing import Optional
+from random import choices
 import torch
 
 
-def get_activation(activation_name: str, *args, **kwargs):
+def get_activation(activation_name: str, **kwargs):
     if activation_name.lower() == 'relu':
         return torch.nn.ReLU()
     elif activation_name.lower() in ['leaky_relu', 'leaky']:
-        return torch.nn.LeakyReLU(*args, **kwargs)
+        return torch.nn.LeakyReLU(**kwargs)
     elif activation_name.lower() == 'silu':
         return torch.nn.SiLU()
     elif activation_name.lower() == 'elu':
-        return torch.nn.ELU(*args, **kwargs)
+        return torch.nn.ELU(**kwargs)
     elif activation_name.lower() == 'softmax':
-        return torch.nn.Softmax(*args, **kwargs)
+        return torch.nn.Softmax(**kwargs)
     elif activation_name.lower() == 'softplus':
-        return torch.nn.Softplus(*args, **kwargs)
+        return torch.nn.Softplus(**kwargs)
     elif activation_name.lower() == 'tanh':
-        return torch.nn.Tanh(*args, **kwargs)
+        return torch.nn.Tanh(**kwargs)
 
-    return torch.nn.Identity(*args, **kwargs)
+    return torch.nn.Identity(**kwargs)
+
+
+def get_permutations(dim: int, select: Optional[int] = None):
+    indices = list(permutations(range(dim)))
+    if select is None:
+        return indices
+    return choices(indices, k=select)

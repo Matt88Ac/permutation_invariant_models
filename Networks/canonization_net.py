@@ -1,8 +1,3 @@
-if __name__ == '__main__':
-    import os
-
-    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 import torch
 from typing import Union, List, Dict
 
@@ -27,7 +22,7 @@ class CanonizationNetMLP(torch.nn.Module):
         if len(activations) > 0:
             for i in range(len(activations)):
                 if isinstance(activations[i], str):
-                    activations[i] = {activations[i]: ([], dict())}
+                    activations[i] = {activations[i]: dict()}
 
         self.layer_dims = [input_dim] + layer_dims + [output_dim]
         self.layers = torch.nn.ModuleList([
@@ -35,9 +30,9 @@ class CanonizationNetMLP(torch.nn.Module):
         ])
         for i, k in enumerate(activations):
             act = tuple(k.items())[0]
-            act, (args, kwargs) = act
+            act, kwargs = act
             self.layers.append(
-                get_activation(act, *args, **kwargs)
+                get_activation(act, **kwargs)
             )
             self.layers.append(
                 torch.nn.Conv1d(self.layer_dims[i + 1], self.layer_dims[i + 2], kernel_size=1)
@@ -65,9 +60,10 @@ class CanonizationNetMLP(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    X = torch.randn(10, 3, 7, dtype=torch.float64)
+    X = torch.randn(10, 3, 7, dtype=torch.float64, device='cuda')
     model = CanonizationNetMLP(3, 15, layer_dims=[5, 2, 18, 4], # inv_dim=-1,
-                               activations=['relu', 'silu', {'softmax': ([1], {})}, 'relu'], dtype=torch.float64)
+                               activations=['relu', 'silu', {'softmax': {'dim': 1}}, 'relu'], dtype=torch.float64,
+                               device='cuda')
     perm = torch.randperm(X.shape[1])
     Y = X[:, perm]
     #perm = torch.randperm(X.shape[2])
