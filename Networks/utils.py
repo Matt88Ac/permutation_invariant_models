@@ -23,8 +23,9 @@ def get_activation(activation_name: str, **kwargs):
     return torch.nn.Identity(**kwargs)
 
 
-def get_permutations(dim: int, select: Optional[int] = None):
+def get_permutations(dim: int, select: Optional[float] = None):
     indices = list(permutations(range(dim)))
     if select is None:
         return indices
-    return choices(indices, k=select)
+    k = max(int(select * len(indices)), 1)
+    return choices(indices, k=k)
