@@ -23,30 +23,3 @@ def get_activation(activation_name: str, *args, **kwargs):
         return torch.nn.Tanh(*args, **kwargs)
 
     return torch.nn.Identity(*args, **kwargs)
-
-
-class MultiChannelMLP(torch.nn.Module):
-    def __init__(self, input_dim: int, output_dim: int, feature_dimension: int,
-                 include_bias: bool = True,
-                 dtype=torch.float64, device=torch.device('cpu')):
-        super(MultiChannelMLP, self).__init__()
-        self.input_dim = input_dim
-        self.feature_dimension = feature_dimension
-        self.output_dim = output_dim
-
-        self.weights = torch.nn.Parameter(
-            torch.randn(output_dim, input_dim, feature_dimension, dtype=dtype, device=device)
-        )
-
-        self.bias = None
-        if include_bias:
-            self.bias = torch.nn.Parameter(
-                torch.randn(output_dim, feature_dimension, dtype=dtype, device=device)
-            )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        :param x: a torch-tensor of shape [batch_size, input_dim, feature_dimension]
-        :return:
-        """
-
