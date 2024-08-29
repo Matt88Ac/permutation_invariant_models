@@ -30,7 +30,7 @@ def test_model(model_type: MODEL_TYPES, batch_size: int, max_in_dim: int = 8, ma
     x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
     INV = test_invariance(model, x, thr)
 
-    model = get_models(model_type)(in_dim, 1, in_channels, out_channels, hidden.tolist(),
+    model = get_models(model_type)(in_dim, in_dim, in_channels, out_channels, hidden.tolist(),
                                    device=device, dtype=dtype, **other_model_parameters)
     x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
 
