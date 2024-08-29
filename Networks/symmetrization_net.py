@@ -35,17 +35,3 @@ class SymmetrizationNetMLP(GeneralInvariantCanonSym):
     @property
     def name(self):
         return 'Symmetrization MLP'
-
-
-if __name__ == '__main__':
-    X = torch.randn(10, 3, 7, dtype=torch.float64, device='cuda')
-    model = SymmetrizationNetMLP(3, 1, 7, 2, hidden_dims=[5, 2, 18, 4],  # inv_dim=-1,
-                                 activations=['relu', 'silu', {'softmax': dict(dim=1)}, 'relu'], dtype=torch.float64,
-                                 device='cuda')
-    perm = torch.randperm(X.shape[1])
-    Y = X[:, perm]
-    # perm = torch.randperm(X.shape[2])
-    # Y = X[:, :, perm]
-    mx = model(X)
-    my = model(Y)
-    print(((mx - my) / mx).abs().mean())

@@ -24,8 +24,11 @@ class GeneralInvariantCanonSym(GeneralLayer):
         self.layer_dims = ([input_dim * input_channels] +
                            [input_dim * d for d in hidden_dims] + [output_dim * self.output_channels])
 
+        # self.layer_dims = ([input_dim] +
+        #                    [d for d in hidden_dims] + [output_dim])
+
         self.layers = torch.nn.ModuleList([
-            torch.nn.Linear(self.layer_dims[0], self.layer_dims[1])
+            torch.nn.Linear(self.layer_dims[0], self.layer_dims[1], )#1)
         ])
 
         for i, k in enumerate(self.activations):
@@ -35,7 +38,7 @@ class GeneralInvariantCanonSym(GeneralLayer):
                 get_activation(act, **kwargs)
             )
             self.layers.append(
-                torch.nn.Linear(self.layer_dims[i + 1], self.layer_dims[i + 2])
+                torch.nn.Linear(self.layer_dims[i + 1], self.layer_dims[i + 2], )#1)
             )
         self.layers = self.layers.to(device=device, dtype=dtype)
         self.output_dim = output_dim
@@ -44,7 +47,6 @@ class GeneralInvariantCanonSym(GeneralLayer):
         pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-
         pre_processed_x = torch.flatten(self.preprocess(x), 1, -1)
         for layer in self.layers:
             pre_processed_x = layer(pre_processed_x)

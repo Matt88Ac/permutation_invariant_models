@@ -27,16 +27,3 @@ class CanonizationNetMLP(GeneralInvariantCanonSym):
     @property
     def name(self):
         return 'Canonization MLP'
-
-
-if __name__ == '__main__':
-    X = torch.randn(10, 3, 7, dtype=torch.float64, device='cuda')
-    model = CanonizationNetMLP(3, 1, 7, hidden_dims=[5, 2, 18, 4],  # inv_dim=-1,
-                               activations=['relu', 'silu', {'softmax': {'dim': 1}}, 'relu'], dtype=torch.float64,
-                               device='cuda')
-    perm = torch.randperm(X.shape[1])
-    Y = X[:, perm]
-    # perm = torch.randperm(X.shape[2])
-    # Y = X[:, :, perm]
-    print(model)
-    print((model(X) - model(Y)).abs().max())

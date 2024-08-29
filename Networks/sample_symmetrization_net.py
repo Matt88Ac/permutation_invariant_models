@@ -9,13 +9,13 @@ except ImportError:
     from Networks.canon_symm_layer import GeneralInvariantCanonSym
 
 
-class SymmetrizationNetMLP(GeneralInvariantCanonSym):
+class SampleSymmetrizationNetMLP(GeneralInvariantCanonSym):
     def __init__(self, input_dim: int, output_dim: int, input_channels: int, output_channels: int = None,
                  hidden_dims: list = None,
                  activations: Union[List[Dict], List[str]] = None,
                  sample_rate: float = 0.05,
                  dtype=torch.float64, device=torch.device('cpu')):
-        super(SymmetrizationNetMLP, self).__init__(input_dim, output_dim, input_channels, output_channels,
+        super(SampleSymmetrizationNetMLP, self).__init__(input_dim, output_dim, input_channels, output_channels,
                                                    hidden_dims, activations, dtype, device)
         self.sample_rate = sample_rate
 
@@ -41,7 +41,7 @@ class SymmetrizationNetMLP(GeneralInvariantCanonSym):
 
 if __name__ == '__main__':
     X = torch.randn(10, 5, 7, dtype=torch.float64, device='cuda')
-    model = SymmetrizationNetMLP(5, 1, 7, 8,
+    model = SampleSymmetrizationNetMLP(5, 1, 7, 8,
                                  hidden_dims=[5, 2, 18, 4],  # inv_dim=-1,
                                  activations=['relu', 'silu', {'softmax': dict(dim=1)}, 'relu'], dtype=torch.float64,
                                  device='cuda')
