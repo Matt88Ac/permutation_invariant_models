@@ -18,47 +18,22 @@ def gen_parameters(max_in_dim: int = 8, max_in_channels: int = 5, max_out_channe
     return in_dim, in_channels, out_channels, hidden, scale
 
 
-def canonization_test(batch_size: int, max_in_dim: int = 8, max_in_channels: int = 5, max_out_channels: int = 5,
-                      max_n_hidden: int = 7, max_scale: float = 20,
-                      thr: float = 1e-10,
-                      device=torch.device('cpu'), dtype=torch.float64):
+def test_model(model_type: MODEL_TYPES, batch_size: int, max_in_dim: int = 8, max_in_channels: int = 5,
+               max_out_channels: int = 5,
+               max_n_hidden: int = 7, max_scale: float = 20, thr: float = 1e-5,
+               device=torch.device('cpu'), dtype=torch.float64, **other_model_parameters):
     in_dim, in_channels, out_channels, hidden, scale = gen_parameters(max_in_dim, max_in_channels, max_out_channels,
                                                                       max_n_hidden, max_scale)
 
-    model = CanonizationNetMLP(in_dim, 1, in_channels, out_channels, hidden.tolist(),
-                               device=device, dtype=dtype)
-
+    model = get_models(model_type)(in_dim, 1, in_channels, out_channels, hidden.tolist(),
+                                   device=device, dtype=dtype, **other_model_parameters)
     x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
     INV = test_invariance(model, x, thr)
 
-    model = CanonizationNetMLP(in_dim, in_dim, in_channels, out_channels, hidden.tolist(),
-                               device=device, dtype=dtype)
-
+    model = get_models(model_type)(in_dim, 1, in_channels, out_channels, hidden.tolist(),
+                                   device=device, dtype=dtype, **other_model_parameters)
     x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
-    EQ = test_equivariance(model, x, thr)
 
+    EQ = test_equivariance(model, x, thr)
     return INV or EQ
 
-
-def sym_test(batch_size: int, max_in_dim: int = 8, max_in_channels: int = 5, max_out_channels: int = 5,
-             max_n_hidden: int = 7, max_scale: float = 20,
-             thr: float = 1e-10,
-             device=torch.device('cpu'), dtype=torch.float64):
-    in_dim, in_channels, out_channels, hidden, scale = gen_parameters(max_in_dim, max_in_channels, max_out_channels,
-                                                                      max_n_hidden, max_scale)
-
-    model = CanonizationNetMLP(in_dim, 1, in_channels, out_channels, hidden.tolist(),
-                               device=device, dtype=dtype)
-
-    x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
-    INV = test_invariance(model, x, thr)
-
-    model = SymmetrizationNetMLP(in_dim, in_dim, in_channels, out_channels, hidden.tolist(),
-                               device=device, dtype=dtype)
-
-    x = gen_random_data(batch_size, (in_dim, in_channels), scale, device, dtype)
-    EQ = test_equivariance(model, x, thr)
-
-    return INV or EQ
-
-print(sym_test(100, device='cuda'))
