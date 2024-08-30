@@ -45,11 +45,14 @@ def fix_activations(activations):
 def positional_encoding(x: torch.Tensor) -> torch.Tensor:
     b, n, d = x.shape
     position = torch.arange(0, n, dtype=x.dtype, device=x.device).unsqueeze(1)
-    div_term = torch.exp(torch.arange(0, d, 2, device=x.device, dtype=x.dtype) * -(math.log(10000.0) / d))
+    div_term = torch.exp(torch.arange(0, d, 2, device=x.device, dtype=x.dtype) * -(math.log(10000.0) / d)).unsqueeze(0)
 
     pos_enc = torch.zeros(1, n, d, device=x.device, dtype=x.dtype)
-
-    pos_enc[0, :, 0::2] = torch.sin(position * div_term)
-    pos_enc[0, :, 1::2] = torch.cos(position * div_term)
+    enc = position * div_term
+    pos_enc[0, :, 0::2] = torch.sin(enc)
+    if d % 2:
+        pos_enc[0, :, 1::2] = torch.cos(enc)[:, :-1]
+    else:
+        pos_enc[0, :, 1::2] = torch.cos(enc)
 
     return x + pos_enc

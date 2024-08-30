@@ -2,10 +2,10 @@ import torch
 from typing import Union, List, Dict
 
 try:
-    from utils import get_activation
+    from utils import get_activation, positional_encoding
     from general_layer import GeneralLayer
 except ImportError:
-    from Networks.utils import get_activation
+    from Networks.utils import get_activation, positional_encoding
     from Networks.general_layer import GeneralLayer
 
 
