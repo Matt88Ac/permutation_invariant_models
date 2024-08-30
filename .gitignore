@@ -164,3 +164,4 @@ cython_debug/
 *.csv
 metrics.py
 *.ipynb
+/test_results
