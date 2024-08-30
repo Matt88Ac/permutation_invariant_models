@@ -36,9 +36,9 @@ def test_sample_symmetrization(device=torch.device('cpu')):
 
 def test_all():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    #test_equivariant(device)
-    #test_canonization(device)
-    #test_symmetrization(device)
+    test_equivariant(device)
+    test_canonization(device)
+    test_symmetrization(device)
     test_sample_symmetrization(device)
 
 
