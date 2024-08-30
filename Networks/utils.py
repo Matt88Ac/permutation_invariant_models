@@ -1,7 +1,8 @@
-from itertools import permutations
-from typing import Optional
-from random import choices
 import math
+from itertools import permutations
+from random import sample
+from typing import Optional
+
 import torch
 
 
@@ -31,7 +32,7 @@ def get_permutations(dim: int, select: Optional[float] = None):
     if select is None:
         return indices
     k = max(int(select * len(indices)), 1)
-    return choices(indices, k=k)
+    return sample(indices, k=k,)
 
 
 def fix_activations(activations):

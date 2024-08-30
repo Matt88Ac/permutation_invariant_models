@@ -25,6 +25,7 @@ def test_equivariant(device=torch.device('cpu')):
 
 def test_sample_symmetrization(device=torch.device('cpu')):
     sample_rates = [0.05, 0.1, 0.2, 0.5, 0.75]
+
     for sr in sample_rates:
         run_and_log(n_tests=1000, model_kind='sample_symmetrization_mlp', batch_size=10_000, max_in_dim=7,
                     max_in_channels=128, max_scale=10, device=device, sample_rate=sr, log_path=f'test_results/sr_{sr}_')
@@ -35,9 +36,9 @@ def test_sample_symmetrization(device=torch.device('cpu')):
 
 def test_all():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    test_equivariant(device)
-    test_canonization(device)
-    test_symmetrization(device)
+    #test_equivariant(device)
+    #test_canonization(device)
+    #test_symmetrization(device)
     test_sample_symmetrization(device)
 
 
