@@ -41,17 +41,11 @@ class DistributionClassifier(nn.Module):
                                                                                           device=device, dtype=dtype))
             self.name = "Augmented"
 
-        self.dropout1 = nn.Dropout2d(p=0.1)
         self.out = nn.Linear(D, 2, device=device, dtype=dtype)
-        # self.dropout2 = nn.Dropout1d(p=0.2)
-
-        # self.pool = nn.AvgPool2d((N, OutD), stride=(1, 1))
         self.device = device
         self.dtype = dtype
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x = self.drop0(x)
         y = nn.functional.leaky_relu(self.inv_model(x))
-        # y = self.dropout1(y)
         y = self.out(y.mean(dim=1))
         return nn.functional.softmax(y, dim=-1)
