@@ -19,7 +19,7 @@ class CanonizationNetMLP(GeneralInvariantCanonSym):
         """
         :param x: a torch-tensor of shape [batch_size, input_dim, feature_dimension]
         :return: a torch-tensor of shape [batch_size, input_dim, feature_dimension],
-            canonized by l2 norm feature-wise
+            canonized by sorting feature-wise
         """
         # x_sort = x.norm(p=2, dim=-1, keepdim=True).argsort(dim=1).expand_as(x)
         x = torch.sort(x, dim=1).values
@@ -42,11 +42,9 @@ class CanonizationNetPosEncode(GeneralInvariantCanonSym):
         """
         :param x: a torch-tensor of shape [batch_size, input_dim, feature_dimension]
         :return: a torch-tensor of shape [batch_size, input_dim, feature_dimension],
-            canonized by l2 norm feature-wise and position-encoded
+            canonized by sorting and position-encoded
         """
-        #  = x.norm(p=2, dim=-1, keepdim=True).argsort(dim=1).expand_as(x)
         x = torch.sort(x, dim=1).values
-        # torch.gather(x, 1, x_sort)
         return positional_encoding(x)
 
     @property
