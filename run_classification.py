@@ -78,14 +78,13 @@ if __name__ == '__main__':
     NS = [2, 4]
     hidden = [32, 64, 32, 5]
     LR = 1e-3
-    N_ITER = 5000
     BATCH_SIZE = 256
     activations = ['relu'] * (len(hidden))
     models = ['canonization_mlp', 'symmetrization_mlp', 'sample_symmetrization_mlp', 'canonization_transformer',
               'symmetrization_transformer', 'sample_symmetrization_transformer', 'equivariant', 'augmentation']
 
     for n_s in [100, 1000, 10000]:
-
+        N_ITER = 5000 if n_s < 10_000 else 1000
         for n in NS:
             train = get_gaussian_dataloader(BATCH_SIZE, n_s, (n, D), device='cuda:0', dtype=torch.float64, shuffle=True, num_workers=0)
             val = get_gaussian_dataloader(n_s, n_s, (n, D), device='cuda:0', dtype=torch.float64)
