@@ -51,16 +51,14 @@ def training_loop(model: DistributionClassifier, train_data, val_data,
             with torch.no_grad():
                 ovr_loss = 0
                 ovr_acc = 0
-                i = 0
                 for x, y in val_data:
                     y_hat = model(x)
                     loss = criterion(y_hat[:, 1:], y.to(dtype=y_hat.dtype))
                     ovr_loss += loss.cpu().detach().numpy().item()
                     ovr_acc += accuracy(y_hat[:, 1:], y)
-                    i += 1
-                val_loss = ovr_loss / i
+                val_loss = ovr_loss
             log[epoch, 2] = val_loss
-            log[epoch, 3] = ovr_acc / i
+            log[epoch, 3] = ovr_acc
             model.train()
 
             log[epoch, -1] = time() - log[epoch, -1]
@@ -76,14 +74,10 @@ def training_loop(model: DistributionClassifier, train_data, val_data,
 
 
 if __name__ == '__main__':
-    # torch.set_default_tensor_type('torch.cuda.FloatTensor')
-    from matplotlib import pyplot as plt
-
-    plt.style.use('ggplot')
     D = 5
     NS = [2, 4]
-    hidden = [8, 128, 128, 8, 5]
-    LR = 1e-4
+    hidden = [32, 64, 32, 5]
+    LR = 1e-3
     N_ITER = 5000
     BATCH_SIZE = 256
     activations = ['relu'] * (len(hidden))
@@ -94,7 +88,7 @@ if __name__ == '__main__':
 
         for n in NS:
             train = get_gaussian_dataloader(BATCH_SIZE, n_s, (n, D), device='cuda:0', dtype=torch.float64, shuffle=True, num_workers=0)
-            val = get_gaussian_dataloader(BATCH_SIZE, n_s, (n, D), device='cuda:0', dtype=torch.float64)
+            val = get_gaussian_dataloader(n_s, n_s, (n, D), device='cuda:0', dtype=torch.float64)
 
             for kind in models:
                 class_model = DistributionClassifier(kind, (n, D), device='cuda', hidden_layers=hidden,
