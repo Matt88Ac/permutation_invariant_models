@@ -19,7 +19,7 @@ class SampleSymmetrizationNetMLP(GeneralInvariantCanonSym):
                                                          hidden_dims, activations, dtype, device)
         self.sample_rate = sample_rate
 
-    def preprocess(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         r"""
         :param x: a torch-tensor of shape [batch_size, input_dim, feature_dimension]
         :return: a torch-tensor of shape [batch_size, input_dim, feature_dimension],
@@ -28,9 +28,10 @@ class SampleSymmetrizationNetMLP(GeneralInvariantCanonSym):
         batch_size, input_dim, feature_dimension = x.shape
         permutations = get_permutations(input_dim, select=self.sample_rate)
         permutations = torch.tensor(permutations, device=x.device, dtype=torch.int)
-        x_symmetric = x[:, permutations[0]].clone()
+        x_symmetric = super().forward(x[:, permutations[0]].clone())
         for sigma in permutations[1:]:
-            x_symmetric += x[:, sigma].clone()
+            # x_symmetric += x[:, sigma].clone()
+            x_symmetric = super().forward(x[:, sigma].clone())
 
         return x_symmetric / len(permutations)
 
@@ -49,7 +50,7 @@ class SampleSymmetrizationNetPosEncode(GeneralInvariantCanonSym):
                                                                hidden_dims, activations, dtype, device)
         self.sample_rate = sample_rate
 
-    def preprocess(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         r"""
         :param x: a torch-tensor of shape [batch_size, input_dim, feature_dimension]
         :return: a torch-tensor of shape [batch_size, input_dim, feature_dimension],
@@ -58,11 +59,15 @@ class SampleSymmetrizationNetPosEncode(GeneralInvariantCanonSym):
         batch_size, input_dim, feature_dimension = x.shape
         permutations = get_permutations(input_dim, select=self.sample_rate)
         permutations = torch.tensor(permutations, device=x.device, dtype=torch.int)
-        x_symmetric = x[:, permutations[0]].clone()
-        for sigma in permutations[1:]:
-            x_symmetric += x[:, sigma].clone()
+        x = positional_encoding(x)
 
-        return positional_encoding(x_symmetric / len(permutations))
+        # x_symmetric = x[:, permutations[0]].clone()
+        x_symmetric = super().forward(x[:, permutations[0]].clone())
+        for sigma in permutations[1:]:
+            # x_symmetric += x[:, sigma].clone()
+            x_symmetric = super().forward(x[:, sigma].clone())
+
+        return x_symmetric / len(permutations)
 
     @property
     def name(self):

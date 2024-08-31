@@ -24,8 +24,8 @@ class GeneralInvariantCanonSym(GeneralLayer):
         self.layer_dims = ([input_dim * input_channels] +
                            [input_dim * d for d in hidden_dims] + [output_dim * self.output_channels])
 
-        # self.layer_dims = ([input_dim] +
-        #                    [d for d in hidden_dims] + [output_dim])
+        # self.layer_dims = ([input_channels] +
+        #                    [d for d in hidden_dims] + [output_channels])
 
         self.layers = torch.nn.ModuleList([
             torch.nn.Linear(self.layer_dims[0], self.layer_dims[1], )#1)
@@ -44,11 +44,16 @@ class GeneralInvariantCanonSym(GeneralLayer):
         self.output_dim = output_dim
 
     def preprocess(self, x: torch.Tensor) -> torch.Tensor:
-        pass
+        return x
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         pre_processed_x = torch.flatten(self.preprocess(x), 1, -1)
         for layer in self.layers:
             pre_processed_x = layer(pre_processed_x)
-        return pre_processed_x.reshape(len(x), self.output_dim, self.output_channels)
+        pre_processed_x = pre_processed_x.reshape(len(x), self.output_dim, self.output_channels)
+        return pre_processed_x
+
+    @property
+    def name(self):
+        return 'Augmented'
 
